@@ -1,0 +1,85 @@
+version: "3.7"
+
+services: 
+    proxy:
+        image: nginx
+        volumes:
+          - ./server/proxy/nginx/nginx.conf:/etc/nginx/nginx.conf # Pega as configurações no nginx
+          - ./server/proxy/nginx/conf.d:/etc/nginx/conf.d # Pega as configurações da api
+          - ./server/api/static/:/usr/share/nginx/html/api/static/ # pega os arqiuvos estáticos do django
+        restart: always
+        environment:
+          - NGINX_HOST=172.25.10.40
+          - NGINX_PORT=80
+        ports:
+          - 80:80
+          - 443:443
+        networks: 
+          backend:
+            ipv4_address: 172.35.10.40
+
+    client:
+        build: 
+            context: ./client/web
+            dockerfile: Dockerfile
+        restart: always
+        volumes: 
+            - ./client/web:/app
+        command: yarn start
+        stdin_open: true
+        environment: 
+            PORT: 80
+        depends_on: 
+            - api
+            - proxy
+        networks: 
+            backend:
+                ipv4_address: 172.35.10.30
+
+    api:
+        build:
+            context: ./server/api
+            dockerfile: Dockerfile
+        command: ./manage.py runserver 0.0.0.0:8000
+        environment: 
+            DB_PASSWORD: password
+            DB_USER: facebook
+            DB_NAME: database
+            DB_HOST: 172.25.20.20
+            DB_PORT: 5432
+        volumes: 
+            - ./server/api:/code
+        restart: always
+        depends_on: 
+            - db
+            - proxy
+        networks: 
+            db:
+                ipv4_address: 172.25.20.10
+            backend:
+                ipv4_address: 172.35.10.10
+
+    db:
+        image: postgres:alpine
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: password
+            POSTGRES_USER: facebook
+            POSTGRES_DB: database
+        networks: 
+            db:
+                ipv4_address: 172.25.20.20
+
+networks:     
+    backend:
+        # Esta rede comunica o proxy com a api
+        driver: bridge
+        ipam:
+            config: 
+                - subnet: 172.35.10.1/16
+    db:
+        # Esta rede isola o proxy da rede do banco de dados, apenas a api e o banco tem acessoa ela
+        driver: bridge
+        ipam:
+            config: 
+                - subnet: 172.25.20.1/16
