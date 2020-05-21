@@ -40,7 +40,7 @@ services:
         build:
             context: ./server/api
             dockerfile: Dockerfile
-        command: ./manage.py runserver 0.0.0.0:8000
+        command: python manage.py runserver 0.0.0.0:8000
         environment: 
             DB_PASSWORD: password
             DB_USER: facebook
