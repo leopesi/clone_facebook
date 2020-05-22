@@ -40,7 +40,7 @@ services:
         build:
             context: ./server/api
             dockerfile: Dockerfile
-        command: bash main.sh
+        command: python server.py
         environment: 
             DB_NAME: database
             DB_USER: facebook
