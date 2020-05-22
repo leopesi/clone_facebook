@@ -4,7 +4,7 @@ services:
     proxy:
         image: nginx
         volumes:
-          - ./server/proxy/nginx/nginx.conf:/etc/nginx/nginx.conf # Pega as configurações no nginx
+        #   - ./server/proxy/nginx/nginx.conf:/etc/nginx/nginx.conf # Pega as configurações no nginx
           - ./server/proxy/nginx/conf.d:/etc/nginx/conf.d # Pega as configurações da api
           - ./server/api/static/:/usr/share/nginx/html/api/static/ # pega os arqiuvos estáticos do django
         restart: always
@@ -40,7 +40,7 @@ services:
         build:
             context: ./server/api
             dockerfile: Dockerfile
-        command: bash main.sh
+        command: sh main.sh
         environment: 
             DB_PASSWORD: password
             DB_USER: facebook
