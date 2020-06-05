@@ -1,0 +1,16 @@
+.logo {
+    margin: 0 auto;
+}
+
+.subtitle-login {
+    text-align: center;
+    margin: 10px 0 !important;
+}
+
+.login-area {
+    margin-top: 20%;
+}
+
+.btn-submit-login {
+    margin: 10px 0 20px 0 !important;
+}
